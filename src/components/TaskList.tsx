@@ -128,14 +128,14 @@ function TaskList({
                         className="p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 dark:bg-blue-600 dark:hover:bg-blue-700"
                         aria-label="Edit task"
                       >
-                        <FaEdit className="h-5 w-5" />
+                        <FaEdit className="h-3 w-3" />
                       </button>
                       <button
                         onClick={() => onDeleteTask(task.id)}
                         className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 dark:bg-red-600 dark:hover:bg-red-700"
                         aria-label="Delete task"
                       >
-                        <FaTrash className="h-5 w-5" />
+                        <FaTrash className="h-3 w-3" />
                       </button>
                     </div>
                   </li>
