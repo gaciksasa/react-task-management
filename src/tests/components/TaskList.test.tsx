@@ -1,19 +1,62 @@
-import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
+/* eslint-disable testing-library/prefer-find-by */
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import TaskList from "../../components/TaskList";
 import {
-  DragDropContext,
   DroppableProvided,
-  DropResult,
+  DraggableProvided,
+  DraggableStateSnapshot,
 } from "react-beautiful-dnd";
+import { Task } from "../../types"; // Make sure to import the Task type from your types file
 
-// Mock react-beautiful-dnd
+// Mock EditTaskPopup component with proper typing
+jest.mock("../../components/EditTaskPopup", () => {
+  return function MockEditTaskPopup({
+    task,
+    onSave,
+    onClose,
+  }: {
+    task: Task;
+    onSave: (id: string, title: string, description: string) => void;
+    onClose: () => void;
+  }) {
+    return (
+      <div data-testid="edit-task-popup">
+        <button
+          onClick={() => onSave(task.id, "Updated Task", "Updated Description")}
+        >
+          Save
+        </button>
+        <button onClick={onClose}>Cancel</button>
+      </div>
+    );
+  };
+});
+
+// Mock for react-beautiful-dnd
 jest.mock("react-beautiful-dnd", () => ({
+  DragDropContext: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="drag-drop-context">{children}</div>
+  ),
   Droppable: ({
     children,
   }: {
-    children: (provided: DroppableProvided, snapshot: any) => React.ReactNode;
+    children: (provided: DroppableProvided) => React.ReactNode;
+  }) =>
+    children({
+      draggableProps: {
+        style: {},
+      },
+      innerRef: jest.fn(),
+      placeholder: null,
+    } as unknown as DroppableProvided),
+  Draggable: ({
+    children,
+  }: {
+    children: (
+      provided: DraggableProvided,
+      snapshot: DraggableStateSnapshot
+    ) => React.ReactNode;
   }) =>
     children(
       {
@@ -21,21 +64,23 @@ jest.mock("react-beautiful-dnd", () => ({
           style: {},
         },
         innerRef: jest.fn(),
-        placeholder: null,
-      } as unknown as DroppableProvided,
-      {}
+        dragHandleProps: null,
+      } as unknown as DraggableProvided,
+      {
+        isDragging: false,
+        isDropAnimating: false,
+        isClone: false,
+        dropAnimation: null,
+        draggingOver: null,
+        combineWith: null,
+        combineTargetFor: null,
+        mode: null,
+      } as DraggableStateSnapshot
     ),
-  DragDropContext: ({
-    children,
-    onDragEnd,
-  }: {
-    children: React.ReactNode;
-    onDragEnd: (result: DropResult) => void;
-  }) => <div onDragEnd={onDragEnd as any}>{children}</div>,
 }));
 
 describe("TaskList", () => {
-  const mockTasks = [
+  const mockTasks: Task[] = [
     {
       id: "1",
       title: "Task 1",
@@ -49,63 +94,81 @@ describe("TaskList", () => {
   const mockOnEditTask = jest.fn();
   const mockOnReorderTasks = jest.fn();
 
-  const renderComponent = (isEditMode = false) =>
-    render(
-      <DragDropContext onDragEnd={jest.fn()}>
-        <TaskList
-          tasks={mockTasks}
-          onToggleTask={mockOnToggleTask}
-          onDeleteTask={mockOnDeleteTask}
-          onEditTask={mockOnEditTask}
-          onReorderTasks={mockOnReorderTasks}
-          isEditMode={isEditMode}
-        />
-      </DragDropContext>
+  const renderComponent = (isEditMode = false) => {
+    return render(
+      <TaskList
+        tasks={mockTasks}
+        onToggleTask={mockOnToggleTask}
+        onDeleteTask={mockOnDeleteTask}
+        onEditTask={mockOnEditTask}
+        onReorderTasks={mockOnReorderTasks}
+        isEditMode={isEditMode}
+      />
+    );
+  };
+
+  it("renders all tasks", async () => {
+    renderComponent();
+    await waitFor(() => expect(screen.getByText("Task 1")).toBeInTheDocument());
+    expect(screen.getByText("Description 1")).toBeInTheDocument();
+    expect(screen.getByText("Task 2")).toBeInTheDocument();
+    expect(screen.getByText("Description 2")).toBeInTheDocument();
+  });
+
+  it("opens EditTaskPopup when edit button is clicked and calls onEditTask when saved", async () => {
+    renderComponent();
+    await waitFor(() =>
+      expect(screen.getAllByLabelText("Edit task")).toHaveLength(2)
     );
 
-  it("renders all tasks", () => {
-    renderComponent();
+    const editButtons = screen.getAllByLabelText("Edit task");
+    fireEvent.click(editButtons[0]);
 
-    mockTasks.forEach((task) => {
-      const taskElement = screen.queryByText(task.title);
-      if (!taskElement) {
-        console.error(`Task with title "${task.title}" not found`);
-        console.log("Current DOM:", document.body.innerHTML);
-      }
-      expect(taskElement).toBeInTheDocument();
-    });
+    await waitFor(() =>
+      expect(screen.getByTestId("edit-task-popup")).toBeInTheDocument()
+    );
+
+    const saveButton = screen.getByText("Save");
+    fireEvent.click(saveButton);
+
+    expect(mockOnEditTask).toHaveBeenCalledWith(
+      "1",
+      "Updated Task",
+      "Updated Description"
+    );
   });
 
-  it("calls onToggleTask when checkbox is clicked", () => {
+  it("calls onDeleteTask when delete button is clicked", async () => {
     renderComponent();
-    const checkbox = screen.getAllByRole("checkbox")[0];
-    fireEvent.click(checkbox);
-    expect(mockOnToggleTask).toHaveBeenCalledWith("1");
-  });
-
-  it("calls onDeleteTask when delete button is clicked", () => {
-    renderComponent();
+    await waitFor(() =>
+      expect(screen.getAllByLabelText("Delete task")).toHaveLength(2)
+    );
     const deleteButtons = screen.getAllByLabelText("Delete task");
     fireEvent.click(deleteButtons[0]);
     expect(mockOnDeleteTask).toHaveBeenCalledWith("1");
   });
 
-  it("calls onEditTask when edit button is clicked", () => {
+  it("calls onToggleTask when checkbox is clicked", async () => {
     renderComponent();
-    const editButtons = screen.getAllByLabelText("Edit task");
-    fireEvent.click(editButtons[0]);
-    expect(mockOnEditTask).toHaveBeenCalledWith("1", "Task 1", "Description 1");
+    await waitFor(() =>
+      expect(screen.getAllByRole("checkbox")).toHaveLength(2)
+    );
+    const checkboxes = screen.getAllByRole("checkbox");
+    fireEvent.click(checkboxes[0]);
+    expect(mockOnToggleTask).toHaveBeenCalledWith("1");
   });
 
-  it("disables drag handle when in edit mode", () => {
-    renderComponent(true);
-    const dragHandles = screen.queryAllByTestId("drag-handle");
-    expect(dragHandles.length).toBe(0);
-  });
-
-  it("renders tasks as completed when they are marked as such", () => {
+  it("renders tasks as completed when they are marked as such", async () => {
     renderComponent();
+    await waitFor(() => expect(screen.getByText("Task 2")).toBeInTheDocument());
     const completedTaskTitle = screen.getByText("Task 2");
     expect(completedTaskTitle).toHaveClass("line-through");
+  });
+
+  it("disables drag handle when in edit mode", async () => {
+    renderComponent(true);
+    await waitFor(() =>
+      expect(screen.queryAllByTestId("drag-handle")).toHaveLength(0)
+    );
   });
 });
