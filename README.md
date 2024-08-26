@@ -30,21 +30,17 @@ Start the development server with:
 
 The application should now be running at http://localhost:3000.
 
-### Open the Application
-
-Open your browser and go to http://localhost:3000 to see the application in action.
-
 ## Test application
-
-Launches the test runner in the interactive watch mode.
 
 ### `npm test`
 
+Launches the test runner in the interactive watch mode.
+
 ## Libraries and Tools Used
 
-React: For building the user interface. React provides a component-based architecture and efficient rendering.
-TypeScript: For adding static typing to JavaScript, which helps in reducing bugs and improving code quality.
-react-beautiful-dnd: For implementing drag-and-drop functionality. It provides a high-level API for making drag-and-drop interactions easy to implement.
-react-icons: For adding icons to the application. It offers a wide range of icons from popular icon libraries.
-Tailwind CSS: For styling the application with utility-first CSS classes, which makes it easier to create responsive designs.
-React Hooks: For managing state and side effects in functional components, promoting a cleaner and more modular code structure.
+- **React**: For building the user interface. React provides a component-based architecture and efficient rendering.
+- **TypeScript**: For adding static typing to JavaScript, which helps in reducing bugs and improving code quality.
+- **react-beautiful-dnd**: For implementing drag-and-drop functionality. It provides a high-level API for making drag-and-drop interactions easy to implement.
+- **react-icons**: For adding icons to the application. It offers a wide range of icons from popular icon libraries.
+- **Tailwind CSS**: For styling the application with utility-first CSS classes, which makes it easier to create responsive designs.
+- **React Hooks**: For managing state and side effects in functional components, promoting a cleaner and more modular code structure.
