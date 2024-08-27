@@ -13,6 +13,8 @@ import EditTaskPopup from "./EditTaskPopup";
 interface ExtendedTaskListProps extends TaskListProps {
   onReorderTasks: (tasks: Task[]) => void;
   isEditMode: boolean;
+  allTasks: Task[]; // Add this prop to receive all tasks
+  currentFilter: "all" | "active" | "completed"; // Add this prop to know the current filter
 }
 
 // Wrapper component to suppress the warning for non-SSR environments
@@ -41,6 +43,8 @@ function TaskList({
   onEditTask,
   onReorderTasks,
   isEditMode,
+  allTasks,
+  currentFilter,
 }: ExtendedTaskListProps) {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
 
@@ -50,12 +54,22 @@ function TaskList({
       return; // Exit if no valid drop location or edit mode is active
     }
 
-    // Reorder tasks based on drag-and-drop result
-    const newTasks = Array.from(tasks);
-    const [reorderedItem] = newTasks.splice(result.source.index, 1);
-    newTasks.splice(result.destination.index, 0, reorderedItem);
+    // Create a new array with all tasks
+    const newAllTasks = Array.from(allTasks);
 
-    onReorderTasks(newTasks); // Update the task order in the state
+    // Find the indices of the dragged task in the full list
+    const sourceIndex = newAllTasks.findIndex(
+      (t) => t.id === tasks[result.source.index].id
+    );
+    const destinationIndex = newAllTasks.findIndex(
+      (t) => t.id === tasks[result.destination!.index].id
+    );
+
+    // Reorder the full list of tasks
+    const [reorderedItem] = newAllTasks.splice(sourceIndex, 1);
+    newAllTasks.splice(destinationIndex, 0, reorderedItem);
+
+    onReorderTasks(newAllTasks); // Update the task order in the state
   };
 
   if (tasks.length === 0) {

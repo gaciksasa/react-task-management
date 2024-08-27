@@ -7,9 +7,10 @@ import {
   DraggableProvided,
   DraggableStateSnapshot,
 } from "@hello-pangea/dnd";
-import { Task } from "../../types"; // Make sure to import the Task type from your types file
+import { Task } from "../../types";
+import { ReactNode } from "react";
 
-// Mock EditTaskPopup component with proper typing
+// Mock EditTaskPopup component
 jest.mock("../../components/EditTaskPopup", () => {
   return function MockEditTaskPopup({
     task,
@@ -33,15 +34,15 @@ jest.mock("../../components/EditTaskPopup", () => {
   };
 });
 
-// Mock for react-beautiful-dnd
-jest.mock("react-beautiful-dnd", () => ({
-  DragDropContext: ({ children }: { children: React.ReactNode }) => (
+// Mock for @hello-pangea/dnd
+jest.mock("@hello-pangea/dnd", () => ({
+  DragDropContext: ({ children }: { children: ReactNode }) => (
     <div data-testid="drag-drop-context">{children}</div>
   ),
   Droppable: ({
     children,
   }: {
-    children: (provided: DroppableProvided) => React.ReactNode;
+    children: (provided: DroppableProvided) => ReactNode;
   }) =>
     children({
       draggableProps: {
@@ -56,7 +57,7 @@ jest.mock("react-beautiful-dnd", () => ({
     children: (
       provided: DraggableProvided,
       snapshot: DraggableStateSnapshot
-    ) => React.ReactNode;
+    ) => ReactNode;
   }) =>
     children(
       {
@@ -98,6 +99,8 @@ describe("TaskList", () => {
     return render(
       <TaskList
         tasks={mockTasks}
+        allTasks={mockTasks}
+        currentFilter="all"
         onToggleTask={mockOnToggleTask}
         onDeleteTask={mockOnDeleteTask}
         onEditTask={mockOnEditTask}

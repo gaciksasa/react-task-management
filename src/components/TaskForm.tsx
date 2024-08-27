@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { FormEvent, useState } from "react";
 import { TaskFormProps } from "../types";
 
 function TaskForm({ onAddTask }: TaskFormProps) {
@@ -7,7 +7,7 @@ function TaskForm({ onAddTask }: TaskFormProps) {
   const [description, setDescription] = useState("");
 
   // Handle form submission
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault(); // Prevent the default form submission behavior
     if (title.trim()) {
       onAddTask(title, description); // Call the parent function to add the task

@@ -4,14 +4,7 @@ import { Task, FilterType } from '../types';
 export const useTasks = () => {
   const [tasks, setTasks] = useState<Task[]>(() => {
     const savedTasks = localStorage.getItem('tasks');
-    if (savedTasks) {
-      // Convert any number IDs to strings
-      return JSON.parse(savedTasks).map((task: any) => ({
-        ...task,
-        id: task.id.toString()
-      }));
-    }
-    return [];
+    return savedTasks ? JSON.parse(savedTasks) : [];
   });
 
   const [filter, setFilter] = useState<FilterType>('all');
@@ -58,6 +51,7 @@ export const useTasks = () => {
 
   return {
     tasks: filteredTasks,
+    allTasks: tasks,
     addTask,
     toggleTask,
     deleteTask,
