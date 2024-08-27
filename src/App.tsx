@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { DragDropContext, DropResult } from "react-beautiful-dnd";
+import { DragDropContext, DropResult } from "@hello-pangea/dnd";
 import TaskForm from "./components/TaskForm";
 import TaskList from "./components/TaskList";
 import FilterButtons from "./components/FilterButtons";

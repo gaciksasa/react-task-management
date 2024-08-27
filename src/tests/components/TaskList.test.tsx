@@ -6,7 +6,7 @@ import {
   DroppableProvided,
   DraggableProvided,
   DraggableStateSnapshot,
-} from "react-beautiful-dnd";
+} from "@hello-pangea/dnd";
 import { Task } from "../../types"; // Make sure to import the Task type from your types file
 
 // Mock EditTaskPopup component with proper typing

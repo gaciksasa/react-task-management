@@ -7,11 +7,7 @@ interface EditTaskPopupProps {
   onClose: () => void; // Callback for closing the popup
 }
 
-const EditTaskPopup: React.FC<EditTaskPopupProps> = ({
-  task,
-  onSave,
-  onClose,
-}) => {
+function EditTaskPopup({ task, onSave, onClose }: EditTaskPopupProps) {
   // State for managing the edited title and description
   const [editTitle, setEditTitle] = useState(task.title);
   const [editDescription, setEditDescription] = useState(task.description);
@@ -99,6 +95,6 @@ const EditTaskPopup: React.FC<EditTaskPopupProps> = ({
       </div>
     </div>
   );
-};
+}
 
 export default EditTaskPopup;

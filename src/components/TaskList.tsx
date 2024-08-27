@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 import { Task, TaskListProps } from "../types";
 import { FaEdit, FaTrash, FaGripVertical } from "react-icons/fa";
 import {
@@ -7,7 +7,7 @@ import {
   Draggable,
   DropResult,
   DroppableProps,
-} from "react-beautiful-dnd";
+} from "@hello-pangea/dnd";
 import EditTaskPopup from "./EditTaskPopup";
 
 interface ExtendedTaskListProps extends TaskListProps {
@@ -19,7 +19,7 @@ interface ExtendedTaskListProps extends TaskListProps {
 const StrictModeDroppable = ({ children, ...props }: DroppableProps) => {
   const [enabled, setEnabled] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const animation = requestAnimationFrame(() => setEnabled(true));
     return () => {
       cancelAnimationFrame(animation);
