@@ -10,6 +10,9 @@ I hereby attest that the development and evaluation of this application were com
 
 This is a Task Management Application built using React and TypeScript. The application allows users to create, edit, delete, and reorder tasks. Users can also filter tasks and toggle between light and dark mode. It features a drag-and-drop interface for task reordering and includes a modal popup for editing tasks.
 
+## DEMO
+https://react-task-management-1v1s.onrender.com/
+
 ## Instructions to Run the Application Locally
 
 Extract the compressed file to local destination of your choice and navigate to project directory:
